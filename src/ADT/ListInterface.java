@@ -11,21 +11,30 @@ import java.util.Iterator;
  * @author user
  */
 public interface ListInterface<T> {
+   //what need to be stored(all): patients, doctor, company, service, medication, prescription, visit....
+    
     boolean add(T element);
+    
     boolean add(int index, T element);
+    
     T remove(int index);
+    
     T getEntry(int index);
+    
     boolean replace(int givenPosition, T newEntry);
+    
     boolean contains(T anEntry);
+    
     // boolean isFull();  there is no such thing as full list in linked data structure.
+    
     int getNumberOfEntries(); //size();
+    
     boolean isEmpty();
+    
     void clear();
-    
-    
+   
     Iterator<T> getIterator();
 
-    //what need to be stored(all): patients, doctor, company, service, medication, prescription, visit....
 }
     
     
