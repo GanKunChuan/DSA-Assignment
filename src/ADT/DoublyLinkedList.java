@@ -4,6 +4,8 @@
  */
 package ADT;
 
+import java.util.Iterator;
+
 /**
  *
  * @author Soh Lian Ze
@@ -35,6 +37,32 @@ public class DoublyLinkedList<T> implements ListInterface<T> {
             this.prev = prev; 
             this.next = next; 
         }*/
+    }
+    
+    
+    // ================== ITERATOR ==================
+    private class ListIterator implements Iterator<T> {
+        private Node currentNode = firstNode;
+
+        @Override
+        public boolean hasNext() {
+            return currentNode != null;
+        }
+
+        @Override
+        public T next() {
+            if (!hasNext()) {       // extra check to avoid nullPointerException
+                throw new java.util.NoSuchElementException();
+            }
+            T data = currentNode.data;      // before pointing to next, put the current data to be returned
+            currentNode = currentNode.next;
+            return data;
+        }
+    }
+    
+    @Override
+    public Iterator<T> getIterator() {
+        return new ListIterator();
     }
     
     
@@ -179,16 +207,24 @@ public class DoublyLinkedList<T> implements ListInterface<T> {
 
     // ================== CONTAINS ==================
     @Override
-    public boolean contains(T anEntry) {
-        Node currentNode = firstNode;
+    public boolean contains(T anEntry) {    //not only for checking certain entry but also for null
+        //Node currentNode = firstNode;
 
-        while (currentNode != null) {
+        /*while (currentNode != null) {
             if (currentNode.data.equals(anEntry)) {
                 return true;
             }
             currentNode = currentNode.next;
         }
-
+        */
+        Iterator<T> it = getIterator();
+        while (it.hasNext()) {
+            T current = it.next();
+            if ((current == null && anEntry == null) || (current != null && current.equals(anEntry))) {
+                return true;        // anEntry == null  check put here because list can store nulls
+            }
+        }
+        
         return false;
     }
 
@@ -211,7 +247,5 @@ public class DoublyLinkedList<T> implements ListInterface<T> {
     public boolean isEmpty() {
         return numberOfEntries == 0;
     }
-
-
 
 }

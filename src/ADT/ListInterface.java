@@ -4,6 +4,8 @@
  */
 package ADT;
 
+import java.util.Iterator;
+
 /**
  *
  * @author user
@@ -20,6 +22,9 @@ public interface ListInterface<T> {
     boolean isEmpty();
     void clear();
     
+    
+    Iterator<T> getIterator();
+
     //what need to be stored(all): patients, doctor, company, service, medication, prescription, visit....
 }
     
