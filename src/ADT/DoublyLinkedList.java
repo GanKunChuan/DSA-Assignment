@@ -21,7 +21,7 @@ public class DoublyLinkedList<T> implements ListInterface<T> {
     }
     
     // ================== NODE ==================
-    private class Node {
+    private class Node implements NodeReference {
         private T data;
         private Node next;
         private Node prev;
@@ -93,8 +93,11 @@ public class DoublyLinkedList<T> implements ListInterface<T> {
 
     // ================== ADD (default) ====================
     
+    // changed to return node instead of boolean because hash and avt need to store reference too
+    
     @Override
-    public boolean add(T newEntry) {
+    //public boolean add(T newEntry) {
+    public NodeReference add(T newEntry){
         Node newNode = new Node(newEntry);
 
         if (isEmpty()) {
@@ -107,14 +110,15 @@ public class DoublyLinkedList<T> implements ListInterface<T> {
         }
 
         numberOfEntries++;
-        return true;
+        //return true;
+        return newNode;   // to be used by hash and avl
     }
 
     // ================== ADD (POSITION) ==================
     @Override
-    public boolean add(int newPosition, T newEntry) {
+    public NodeReference add(int newPosition, T newEntry) {
         if (newPosition < 1 || newPosition > numberOfEntries + 1) {
-            return false;               // invalid range, straight away stop here
+            return null;               // invalid range, straight away stop here
         }
 
         Node newNode = new Node(newEntry);
@@ -146,7 +150,7 @@ public class DoublyLinkedList<T> implements ListInterface<T> {
         }
 
         numberOfEntries++;
-        return true;
+        return newNode;     
     }
 
     // ================== REMOVE ==================
@@ -183,6 +187,39 @@ public class DoublyLinkedList<T> implements ListInterface<T> {
         return data;
     }
 
+    @Override
+    public T removeNode(NodeReference nodeReference) {    // pointer-based approach removal for avl and hash
+        // 1. Cast the generic reference back to your private Node class
+        Node nodeToRemove = (Node) nodeReference;
+        if (nodeToRemove == null) return null;
+
+        T data = nodeToRemove.data;
+
+        // If it's the only node
+        if (numberOfEntries == 1) {
+            firstNode = null;
+            lastNode = null;
+        } 
+        // If it's the first node
+        else if (nodeToRemove == firstNode) {
+            firstNode = firstNode.next;
+            firstNode.prev = null;
+        } 
+        // If it's the last node
+        else if (nodeToRemove == lastNode) {
+            lastNode = lastNode.prev;
+            lastNode.next = null;
+        } 
+        // If it's in the middle (The real DLL power!)
+        else {
+            nodeToRemove.prev.next = nodeToRemove.next;
+            nodeToRemove.next.prev = nodeToRemove.prev;
+        }
+
+        numberOfEntries--;
+        return data;
+    }    
+    
     // ================== GET ==================
     @Override
     public T getEntry(int givenPosition) {

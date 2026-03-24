@@ -2,8 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package ADT;
+package ADT.superceded;
 
+import ADT.DoublyLinkedList;
+import ADT.ListInterface;
 import java.util.Comparator;
 
 /**
@@ -11,6 +13,9 @@ import java.util.Comparator;
  * @author user
  * @param <T>
  */
+
+// ABANDONED
+
 
 //wrapper class using adt            
 public class SortedLinkedList<T /*extends Comparable<T>*/> implements SortedListInterface<T> {
