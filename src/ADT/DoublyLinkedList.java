@@ -192,7 +192,7 @@ public class DoublyLinkedList<T> implements ListInterface<T> {
     }
 
     @Override
-    public T removeNode(NodeReference ref) {    // pointer-based approach removal for avl and hash
+    public T removeNode(NodeReference ref) {    // pointer-based approach dll removal for avl and hash
         // 1. Cast the generic reference back to your private Node class and safety check
         
         Node nodeToRemove;
@@ -256,6 +256,18 @@ public class DoublyLinkedList<T> implements ListInterface<T> {
             return null;
         }
         return getNodeAt(givenPosition).data;
+    }
+    
+    //  GET THROUGH REFERENCE
+    @Override
+    public T getNodeData(NodeReference ref) {
+        try {
+            Node node = (Node) ref;
+            if (node == null || node.owner != this) return null;
+            return node.data;
+        } catch (ClassCastException e) {
+            return null;
+        }
     }
     
 
