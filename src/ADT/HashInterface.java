@@ -20,6 +20,8 @@ public interface HashInterface<K, V> {
     void remove(K key);            // delete entry
 
     boolean isEmpty();             // check if empty
+    
+    int size();
 
     void clear();                  // reset table
 }

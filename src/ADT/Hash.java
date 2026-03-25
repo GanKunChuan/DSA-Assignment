@@ -10,7 +10,8 @@ package ADT;
  */
 public class Hash<K, V> implements HashInterface<K, V>{
 
-    private ListInterface[] table;
+    private ListInterface<Entry<K, V>>[] table;
+    private int totalEntries;
     private int size = 101;   //prime number
 
     public Hash() {
@@ -44,17 +45,19 @@ public class Hash<K, V> implements HashInterface<K, V>{
         ListInterface<Entry<K,V>> list = (ListInterface<Entry<K,V>>) table[index];
 
         // check duplicate
-        if (list != null) { // firstly null check for safety
-            for (int i = 1; i <= list.getNumberOfEntries(); i++) {
-                Entry<K,V> e = list.getEntry(i);
+        
+        int n = list.getNumberOfEntries();
+        for (int i = 1; i <= n; i++) {
+            Entry<K,V> e = list.getEntry(i);
 
-                if ((e.key == null && key == null) || (e.key != null && e.key.equals(key))) {
-                    e.value = value; // update
-                    return;
-                }
+            if ((e.key == null && key == null) || (e.key != null && e.key.equals(key))) {
+                e.value = value; // update
+                return;
             }
         }
+        
         list.add(new Entry<>(key, value));  // Diamond operator <> ensures type safety
+        totalEntries++;
 
     }
 
@@ -67,7 +70,8 @@ public class Hash<K, V> implements HashInterface<K, V>{
 
         if (list == null) return null;
 
-        for (int i = 1; i <= list.getNumberOfEntries(); i++) {
+        int n = list.getNumberOfEntries();
+        for (int i = 1; i <= n; i++) {
             Entry<K,V> e = list.getEntry(i);
 
             if ((e.key == null && key == null) || (e.key != null && e.key.equals(key))) {       
@@ -92,12 +96,14 @@ public class Hash<K, V> implements HashInterface<K, V>{
         ListInterface<Entry<K,V>> list = (ListInterface<Entry<K,V>>) table[index];
 
         if (list == null) return;
-
-        for (int i = 1; i <= list.getNumberOfEntries(); i++) {
+        
+        int n = list.getNumberOfEntries();
+        for (int i = 1; i <= n; i++) {
             Entry<K,V> e = list.getEntry(i);
 
             if ((e.key == null && key == null) || (e.key != null && e.key.equals(key))) {
                 list.remove(i);
+                totalEntries--;
                 return;
             }
         }
@@ -107,17 +113,19 @@ public class Hash<K, V> implements HashInterface<K, V>{
 
     @Override
     public boolean isEmpty() {
-        for (int i = 0; i < size; i++) {
-            if (table[i] != null && table[i].getNumberOfEntries() > 0) {
-                return false;
-            }
-        }
-        return true;
+        return totalEntries == 0;
     }
+    
+    
+    public int size() {
+        return totalEntries;
+    }
+    
     
     @Override
     @SuppressWarnings("unchecked")
     public void clear() {
-        table = new ListInterface[size];
+        table = (ListInterface<Entry<K, V>>[]) new ListInterface[size];
+        totalEntries = 0;  
     }
 }

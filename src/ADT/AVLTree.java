@@ -12,39 +12,42 @@ package ADT;
 
 public class AVLTree<T extends Comparable<T>> implements AVLTreeInterface<T>{
 
-    private class Node {
+    private class AVLNode {
         T key;
-        Object ref;   // R stand for reference to DLL node (keep generic to avoid tight coupling)
+        //NodeReference ref;   // reference to DLL node
+        ListInterface<NodeReference> refs;  // multiple patients, assume case like same names (duplicate but not)
 
         int height;
-        Node left, right;
+        AVLNode left, right;
 
-        Node(T key, Object ref) {
+        AVLNode(T key, NodeReference ref) {
             this.key = key;
-            this.ref = ref;
+            //this.ref = ref;
+            this.refs = new DoublyLinkedList<>();
+            this.refs.add(ref);
             this.height = 1;
         }
     }
 
-    private Node root;
+    private AVLNode root;
 
     // ================= HEIGHT =================
-    private int height(Node n) {
+    private int height(AVLNode n) {
         return (n == null) ? 0 : n.height;
     }
 
-    private int getBalance(Node n) {
+    private int getBalance(AVLNode n) {
         return (n == null) ? 0 : height(n.left) - height(n.right);
     }
 
-    private void updateHeight(Node n) {
+    private void updateHeight(AVLNode n) {
         n.height = 1 + Math.max(height(n.left), height(n.right));
     }
 
     // ================= ROTATIONS =================
-    private Node rightRotate(Node y) {
-        Node x = y.left;
-        Node T2 = x.right;
+    private AVLNode rightRotate(AVLNode y) {
+        AVLNode x = y.left;
+        AVLNode T2 = x.right;
 
         x.right = y;
         y.left = T2;
@@ -55,9 +58,9 @@ public class AVLTree<T extends Comparable<T>> implements AVLTreeInterface<T>{
         return x;
     }
 
-    private Node leftRotate(Node x) {
-        Node y = x.right;
-        Node T2 = y.left;
+    private AVLNode leftRotate(AVLNode x) {
+        AVLNode y = x.right;
+        AVLNode T2 = y.left;
 
         y.left = x;
         x.right = T2;
@@ -70,20 +73,22 @@ public class AVLTree<T extends Comparable<T>> implements AVLTreeInterface<T>{
 
     // ================= INSERT =================
     @Override
-    public void insert(T key, Object ref) {
+    public void insert(T key, NodeReference ref) {
         root = insertRec(root, key, ref);
     }
 
-    private Node insertRec(Node node, T key, Object ref) {
+    private AVLNode insertRec(AVLNode node, T key, NodeReference ref) {
         if (node == null)
-            return new Node(key, ref);
+            return new AVLNode(key, ref);
 
-        if (key.compareTo(node.key) < 0)
+        if (key.compareTo(node.key) < 0){
             node.left = insertRec(node.left, key, ref);
-        else if (key.compareTo(node.key) > 0)
+        } else if (key.compareTo(node.key) > 0){
             node.right = insertRec(node.right, key, ref);
-        else
-            return node; // duplicate ignored
+        } else {
+            node.refs.add(ref); // store duplicate
+            return node; 
+        }
 
         updateHeight(node);
 
@@ -115,26 +120,44 @@ public class AVLTree<T extends Comparable<T>> implements AVLTreeInterface<T>{
     
     // ================= DELETE =================
     @Override
-    public void delete(T key) {
-        root = deleteRec(root, key);
+    public void delete(T key, NodeReference ref) {
+        root = deleteRec(root, key, ref);
     }
     
     
-    private Node deleteRec(Node node, T key) {
+    private AVLNode deleteRec(AVLNode node, T key, NodeReference ref) {
 
         if (node == null) return null;
 
         // 1. NORMAL BST DELETE
         if (key.compareTo(node.key) < 0) {
-            node.left = deleteRec(node.left, key);
+            node.left = deleteRec(node.left, key, ref);
         } else if (key.compareTo(node.key) > 0) {
-            node.right = deleteRec(node.right, key);
+            node.right = deleteRec(node.right, key, ref);
         } else {
             // FOUND NODE
+            
+            // STEP 1: Remove ONLY the specific reference
+            ListInterface<NodeReference> list = node.refs;
+            int n = list.getNumberOfEntries();
 
+            for (int i = 1; i <= n; i++) {
+                if (list.getEntry(i) == ref) {   // reference comparison, use == to compare reference not equals()
+                    list.remove(i);
+                    break;
+                }
+            }
+
+            // STEP 2: If still has other refs → STOP here
+            if (!list.isEmpty()) {
+                return node;
+            }
+
+            // STEP 3: If empty → remove node like normal AVL
+            //--
             // case 1: no child or 1 child
             if (node.left == null || node.right == null) {
-                Node temp = (node.left != null) ? node.left : node.right;
+                AVLNode temp = (node.left != null) ? node.left : node.right;
 
                 if (temp == null) {
                     return null; // no child
@@ -144,12 +167,12 @@ public class AVLTree<T extends Comparable<T>> implements AVLTreeInterface<T>{
             }
 
             // case 2: two children → use inorder successor
-            Node successor = getMin(node.right);
+            AVLNode successor = getMin(node.right);
 
             node.key = successor.key;
-            node.ref = successor.ref;
+            node.refs = successor.refs;
 
-            node.right = deleteRec(node.right, successor.key);
+            node.right = deleteRec(node.right, successor.key, successor.refs.getEntry(1));
         }
 
         // 2. UPDATE HEIGHT
@@ -183,7 +206,7 @@ public class AVLTree<T extends Comparable<T>> implements AVLTreeInterface<T>{
 
     
     // ========= HELPER METHOD FOR SUCCESSOR
-    private Node getMin(Node node) {
+    private AVLNode getMin(AVLNode node) {
         while (node.left != null) {
             node = node.left;
         }
@@ -193,13 +216,13 @@ public class AVLTree<T extends Comparable<T>> implements AVLTreeInterface<T>{
     
     // ================= SEARCH =================
     @Override
-    public Object search(T key) {
-        Node result = searchRec(root, key);
-        return (result == null) ? null : result.ref;
+    public ListInterface<NodeReference> search(T key) {
+        AVLNode result = searchRec(root, key);
+        return (result == null) ? null : result.refs;
     }
 
-    private Node searchRec(Node node, T key) {
-        if (node == null || key.equals(node.key))
+    private AVLNode searchRec(AVLNode node, T key) {
+        if (node == null || key.compareTo(node.key) == 0)
             return node;
 
         if (key.compareTo(node.key) < 0)
@@ -232,17 +255,25 @@ public class AVLTree<T extends Comparable<T>> implements AVLTreeInterface<T>{
     
     // ================= INORDER =================
     
-    public ListInterface<Object> getInOrderList() {
-        ListInterface<Object> result = new DoublyLinkedList<>();
+    public ListInterface<NodeReference> getInOrderList() {
+        ListInterface<NodeReference> result = new DoublyLinkedList<>();
         inOrderCollect(root, result);
         return result;
     }
     
     // recursive collector
-    private void inOrderCollect(Node node, ListInterface<Object> list) {
+    private void inOrderCollect(AVLNode node, ListInterface<NodeReference> list) {
         if (node != null) {
             inOrderCollect(node.left, list);
-            list.add(node.ref);   // store DLL node reference
+            //list.add(node.ref);   // store DLL node reference
+            
+            ListInterface<NodeReference> refs = node.refs;
+            int n = refs.getNumberOfEntries();
+
+            for (int i = 1; i <= n; i++) {
+                list.add(refs.getEntry(i));
+            }
+            
             inOrderCollect(node.right, list);
         }
     }

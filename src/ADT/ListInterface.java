@@ -13,19 +13,16 @@ import java.util.Iterator;
  */
 public interface ListInterface<T> {
    //what need to be stored(all): patients, doctor, company, service, medication, prescription, visit...
-
-    // A hollow interface that does nothing but act as a "Label", IMPORTANT
-    interface NodeReference {}          // avoid using Object, and using extra generic type in parameter
     
     //boolean add(T element);
-    public NodeReference add(T newEntry);       //while also return node(reference)
+    NodeReference add(T newEntry);       //while also return node(reference)
     
     //boolean add(int index, T element);
-    public NodeReference add(int newPosition, T newEntry);      //while also return node(reference)
+    NodeReference add(int newPosition, T newEntry);      //while also return node(reference)
     
     T remove(int index);
 
-    public T removeNode(NodeReference nodeReference);
+    T removeNode(NodeReference ref);
     
     T getEntry(int index);
     

@@ -9,6 +9,7 @@ import java.util.Iterator;
 /**
  *
  * @author Soh Lian Ze
+ * @param <T>
  */
 public class DoublyLinkedList<T> implements ListInterface<T> {
     //core ADT
@@ -25,11 +26,14 @@ public class DoublyLinkedList<T> implements ListInterface<T> {
         private T data;
         private Node next;
         private Node prev;
+        
+        private DoublyLinkedList<T> owner;
 
         private Node(T data) {
             this.data = data;
             next = null;
             prev = null;
+            this.owner = DoublyLinkedList.this;  //the node created belongs to the list created it
         }
         
         /*private Node(T data, Node prev, Node next){
@@ -188,10 +192,26 @@ public class DoublyLinkedList<T> implements ListInterface<T> {
     }
 
     @Override
-    public T removeNode(NodeReference nodeReference) {    // pointer-based approach removal for avl and hash
-        // 1. Cast the generic reference back to your private Node class
-        Node nodeToRemove = (Node) nodeReference;
+    public T removeNode(NodeReference ref) {    // pointer-based approach removal for avl and hash
+        // 1. Cast the generic reference back to your private Node class and safety check
+        
+        Node nodeToRemove;
+        
+        
+        // safe casting back to node
+        try {
+            nodeToRemove = (Node) ref;
+        } catch (ClassCastException e) {
+            return null;
+        }
+        
+        //check null
         if (nodeToRemove == null) return null;
+        
+        // Ownership check 
+        if (nodeToRemove.owner != this) {
+            return null; // prevent cross-list corruption
+        }
 
         T data = nodeToRemove.data;
 
@@ -210,14 +230,23 @@ public class DoublyLinkedList<T> implements ListInterface<T> {
             lastNode = lastNode.prev;
             lastNode.next = null;
         } 
-        // If it's in the middle (The real DLL power!)
+        // If it's in the middle 
         else {
-            nodeToRemove.prev.next = nodeToRemove.next;
-            nodeToRemove.next.prev = nodeToRemove.prev;
+            nodeToRemove.prev.next = nodeToRemove.next;     //pointer next of nodebefore point to nodeafter 
+            nodeToRemove.next.prev = nodeToRemove.prev;     //pointer prev of nodeafter point to nodeprev
         }
 
         numberOfEntries--;
+        
+        //reset after removal for safe reuse
+        nodeToRemove.data = null;
+        nodeToRemove.owner = null;
+        nodeToRemove.next = null;
+        nodeToRemove.prev = null;
+        
         return data;
+       
+        
     }    
     
     // ================== GET ==================

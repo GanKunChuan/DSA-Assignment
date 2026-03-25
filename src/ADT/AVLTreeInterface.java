@@ -7,15 +7,16 @@ package ADT;
 /**
  *
  * @author Soh Lian Ze
+ * @param <T>
  */
 
 public interface AVLTreeInterface<T> {
 
-    void insert(T key, Object ref);
+    void insert(T key, NodeReference ref);
 
-    Object search(T key);
+    ListInterface<NodeReference> search(T key);
 
-    void delete(T key);
+    void delete(T key, NodeReference ref);  // cater for avoiding deleting all node with same value
 
     boolean contains(T key);
 
