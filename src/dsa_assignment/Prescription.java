@@ -1,4 +1,5 @@
 package dsa_assignment;
+
 import java.time.LocalDate;
 
 public class Prescription {
@@ -7,8 +8,8 @@ public class Prescription {
     private String notes;
     private LocalDate dateIssued;
 
-    public void addItem(Prescribeditem item) { }
-    public void removeItem(String itemID) { }
-    public double getTotalCost() { return 0; }   // iterates items, sums getSubtotal()
-    public void applyToStock() { }               // iterates items, calls medication.reduceStock()
+    public void addItem(Prescribeditem item) { items.add(item); }
+    public void removeItem(String itemID) { }   // iterate items, match itemID, remove
+    public double getTotalCost() { return 0; }  // iterate items, sum getSubtotal()
+    public void applyToStock() { }              // iterate items, call medication.reduceStock()
 }

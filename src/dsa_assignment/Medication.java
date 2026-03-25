@@ -9,6 +9,7 @@ public class Medication {
     private double sellingPrice;
 
     public boolean isLowStock() { return quantity < lowStockThreshold; }
-    public void reduceStock(int qty) { }
-    public void restock(int qty) { }
+    public void reduceStock(int qty) { this.quantity -= qty; }
+    public void restock(int qty) { this.quantity += qty; }
+    public double getSellingPrice() { return sellingPrice; }
 }
