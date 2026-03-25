@@ -10,7 +10,7 @@ package ADT;
  * @param <T>
  */
 
-public class AVLTree<T extends Comparable<T>> implements AVLTreeInterface<T>{
+public class AVLTree<T extends Comparable<? super T>> implements AVLTreeInterface<T>{
 
     private class AVLNode {
         T key;

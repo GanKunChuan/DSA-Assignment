@@ -26,6 +26,8 @@ public interface ListInterface<T> {
     
     T getEntry(int index);
     
+    T getNodeData(NodeReference ref);
+    
     boolean replace(int givenPosition, T newEntry);
     
     boolean contains(T anEntry);
