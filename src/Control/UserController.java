@@ -15,10 +15,7 @@ import Entity.Patient;
 import Entity.Specialization;
 import java.time.LocalTime;
 
-/**
- *
- * @author KC
- */
+
 public class UserController {
 
     // ================= CORE STORAGE (DLL) =================
