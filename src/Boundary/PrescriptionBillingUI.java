@@ -1,7 +1,7 @@
 /*
  * @author Shaft (Module 3 - Prescription, Inventory & Billing)
  */
-package Boundary;
+package Boundary;//
 
 import Control.BillingStockingController;
 import Entity.Medication;
