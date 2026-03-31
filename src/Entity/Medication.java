@@ -1,7 +1,7 @@
 /*
  * @author Shaft (Module 3 - Prescription, Inventory & Billing)
  */
-package Entity;
+package Entity; //
 
 public class Medication {
 
